@@ -9,11 +9,11 @@ export class User {
   @Prop({ required: true })
   name: string;
 
-  @Prop()
-  email: string;
-
-  @Prop()
-  password: string;
+  @Prop({ required: true, unique: true })
+  credentials: {
+    email: string;
+    password: string;
+  };
 
   @Prop({ type: { provider: String, id: String } })
   oauthAccounts: {
@@ -32,11 +32,12 @@ const UserSchema = SchemaFactory.createForClass(User);
 
 // hash password before saving
 UserSchema.pre<UserDocument>('save', async function (next) {
-  if (this.password) {
-    const hash = await bcrypt.hash(this.password, 10);
-    this.password = hash;
+  if (this.credentials.password) {
+    this.credentials.password = await bcrypt.hash(
+      this.credentials.password,
+      10,
+    );
   }
-  next();
 });
 
 export { UserSchema };

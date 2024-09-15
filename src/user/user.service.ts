@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User } from 'src/user/schemas/user.schema';
 import { CreateUserDto } from './dtos/create-user.dto';
+import { User } from './schemas/user.schema';
 
 @Injectable()
 export class UserService {
@@ -21,11 +21,11 @@ export class UserService {
   }
 
   async findOne(id: string): Promise<User> {
-    return this.userModel.findById(id).exec();
+    return this.userModel.findById({ _id: id }).exec();
   }
 
   async findByEmail(email: string): Promise<User> {
-    return this.userModel.findOne({ email }).exec();
+    return this.userModel.findOne({ credentials: { email } });
   }
 
   async findByGoogleId(id: string): Promise<User> {

@@ -4,39 +4,30 @@ import * as bcrypt from 'bcrypt';
 
 export type UserDocument = HydratedDocument<User>;
 
-@Schema()
+@Schema({ timestamps: true })
 export class User {
   @Prop({ required: true })
   name: string;
 
   @Prop({ required: true, unique: true })
-  credentials: {
-    email: string;
-    password: string;
-  };
+  email: string;
+
+  @Prop({ required: true })
+  password: string;
 
   @Prop({ type: { provider: String, id: String } })
   oauthAccounts: {
     provider: string;
     id: string;
   }[];
-
-  @Prop({ default: Date.now })
-  createdAt: Date;
-
-  @Prop({ default: Date.now })
-  updatedAt: Date;
 }
 
 const UserSchema = SchemaFactory.createForClass(User);
 
 // hash password before saving
 UserSchema.pre<UserDocument>('save', async function (next) {
-  if (this.credentials.password) {
-    this.credentials.password = await bcrypt.hash(
-      this.credentials.password,
-      10,
-    );
+  if (this.password) {
+    this.password = await bcrypt.hash(this.password, 10);
   }
 });
 

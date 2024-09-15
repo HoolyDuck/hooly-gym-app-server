@@ -9,15 +9,8 @@ export class UserService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
-    const credentials = {
-      email: createUserDto.email,
-      password: createUserDto.password,
-    };
-    const createdUser = await this.userModel.create({
-      name: createUserDto.name,
-      credentials,
-    });
-    return createdUser;
+    const createdUser = await this.userModel.create(createUserDto);
+    return createdUser.toObject();
   }
 
   async findOne(id: string): Promise<User> {
@@ -25,12 +18,14 @@ export class UserService {
   }
 
   async findByEmail(email: string): Promise<User> {
-    return this.userModel.findOne({ credentials: { email } });
+    return this.userModel.findOne({ email }).exec();
   }
 
   async findByGoogleId(id: string): Promise<User> {
-    return this.userModel.findOne({
-      oauthAccounts: { $elemMatch: { provider: 'google', id } },
-    });
+    return this.userModel
+      .findOne({
+        oauthAccounts: { $elemMatch: { provider: 'google', id } },
+      })
+      .exec();
   }
 }

@@ -1,11 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import { HydratedDocument, Types } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 
 export type UserDocument = HydratedDocument<User>;
 
 @Schema({ timestamps: true })
 export class User {
+  _id: string;
+
   @Prop({ required: true })
   name: string;
 
@@ -24,7 +26,6 @@ export class User {
 
 const UserSchema = SchemaFactory.createForClass(User);
 
-// hash password before saving
 UserSchema.pre<UserDocument>('save', async function (next) {
   if (this.password) {
     this.password = await bcrypt.hash(this.password, 10);

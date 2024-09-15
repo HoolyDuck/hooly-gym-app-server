@@ -26,17 +26,12 @@ export class AuthService {
     return { ...user, accessToken: await this.#generateToken(user) };
   }
 
-  async register(
-    registerDto: RegisterDto,
-  ): Promise<User & { accessToken: string }> {
+  async register(registerDto: RegisterDto): Promise<User> | never {
     const user = await this.userService.findByEmail(registerDto.email);
     if (user) throw new UnauthorizedException('User already exists');
 
     const createdUser = await this.userService.create(registerDto);
-    return {
-      ...createdUser,
-      accessToken: await this.#generateToken(createdUser),
-    };
+    return createdUser;
   }
 
   async #generateToken(user: User): Promise<string> {

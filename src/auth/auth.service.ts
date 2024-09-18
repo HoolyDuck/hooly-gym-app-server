@@ -22,8 +22,15 @@ export class AuthService {
     return user;
   }
 
-  async login(user: User): Promise<User & { accessToken: string }> {
-    return { ...user, accessToken: await this.#generateToken(user) };
+  async validateJwtUser(userId: string): Promise<User> | never {
+    const user = await this.userService.findOne(userId);
+    if (!user) throw new UnauthorizedException('User not found');
+
+    return user;
+  }
+
+  async login(user: User): Promise<{ accessToken: string }> {
+    return { accessToken: this.#generateToken(user) };
   }
 
   async register(registerDto: RegisterDto): Promise<User> | never {
@@ -34,8 +41,8 @@ export class AuthService {
     return createdUser;
   }
 
-  async #generateToken(user: User): Promise<string> {
-    const payload = { email: user.email, sub: user._id };
+  #generateToken(user: User): string {
+    const payload = { sub: user._id };
     return this.jwtService.sign(payload);
   }
 }

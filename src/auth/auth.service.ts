@@ -4,6 +4,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcrypt';
 import { RegisterDto } from './dtos/register.dto';
+import { AuthGooglePayload } from './types/auth-google-payload';
 
 @Injectable()
 export class AuthService {
@@ -27,6 +28,26 @@ export class AuthService {
     if (!user) throw new UnauthorizedException('User not found');
 
     return user;
+  }
+
+  async validateGoogleUser(payload: AuthGooglePayload): Promise<User> | never {
+    const existingUser = await this.userService.findByGoogleId(
+      payload.googleId,
+    );
+    if (existingUser) return existingUser;
+
+ 
+
+
+    const createdUser = await this.userService.create({
+      ...payload,
+    });
+    createdUser.oauthAccounts.push({
+      provider: 'google',
+      id: payload.googleId,
+    });
+    await createdUser.save();
+    return createdUser;
   }
 
   async login(user: User): Promise<{ accessToken: string }> {

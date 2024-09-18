@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
 import * as bcrypt from 'bcrypt';
+import { Exclude } from 'class-transformer';
 
 export type UserDocument = HydratedDocument<User>;
 
@@ -14,10 +15,12 @@ export class User {
   @Prop({ required: true, unique: true })
   email: string;
 
+  @Exclude()
   @Prop({ required: true })
   password: string;
 
-  @Prop({ type: { provider: String, id: String } })
+  @Exclude()
+  @Prop({ type: [{ provider: String, id: String }], default: [] })
   oauthAccounts: {
     provider: string;
     id: string;

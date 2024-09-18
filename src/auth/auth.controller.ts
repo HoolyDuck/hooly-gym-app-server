@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Inject,
   Post,
   Req,
   Res,
@@ -17,10 +18,16 @@ import { Request, Response } from 'express';
 import { GetUser } from './decorators/get-user.decorator';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { GoogleAuthGuard } from './guards/google-auth.guard';
+import { ConfigType } from '@nestjs/config';
+import frontendConfig from '@/common/config/frontend.config';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    @Inject(frontendConfig.KEY)
+    private frontendConfiguration: ConfigType<typeof frontendConfig>,
+  ) {}
 
   @Post('register')
   async register(@Body() registerDto: RegisterDto): Promise<User> {
@@ -60,6 +67,6 @@ export class AuthController {
   ): Promise<void> {
     const { accessToken } = await this.authService.login(user);
     res.cookie('accessToken', accessToken, { httpOnly: true });
-    res.redirect('http://localhost:3000');
+    res.redirect(this.frontendConfiguration.url);
   }
 }

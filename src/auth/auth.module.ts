@@ -11,6 +11,7 @@ import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
 import googleConfig from './config/google.config';
+import frontendConfig from '@/common/config/frontend.config';
 
 @Module({
   imports: [
@@ -18,8 +19,15 @@ import googleConfig from './config/google.config';
     JwtModule.registerAsync(jwtConfig.asProvider()),
     ConfigModule.forFeature(jwtConfig),
     ConfigModule.forFeature(googleConfig),
+    ConfigModule.forFeature(frontendConfig),
   ],
-  providers: [AuthService, UserService, JwtStrategy, LocalStrategy, GoogleStrategy],
+  providers: [
+    AuthService,
+    UserService,
+    JwtStrategy,
+    LocalStrategy,
+    GoogleStrategy,
+  ],
   controllers: [AuthController],
 })
 export class AuthModule {}

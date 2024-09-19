@@ -19,7 +19,6 @@ import frontendConfig from '@/common/config/frontend.config';
     JwtModule.registerAsync(jwtConfig.asProvider()),
     ConfigModule.forFeature(jwtConfig),
     ConfigModule.forFeature(googleConfig),
-    ConfigModule.forFeature(frontendConfig),
   ],
   providers: [
     AuthService,
